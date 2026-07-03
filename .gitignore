@@ -22,3 +22,5 @@ Thumbs.db
 Data/raw/*.csv
 Data/cleaned/*.csv
 Data/processed/*.csv
+
+*.csv
