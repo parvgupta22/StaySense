@@ -11,11 +11,18 @@ import pandas as pd
 import numpy as np
 
 from sklearn.neighbors import NearestNeighbors
+from pathlib import Path
+
+
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+DATA_DIR = PROJECT_ROOT / "Data" / "processed"
+DATA_DIR_2=PROJECT_ROOT / "Data" / "cleaned"
+
 
 # Load Processed Data
-master = pd.read_csv("Data/processed/master.csv")
-
-similarity_df = pd.read_csv("Data/processed/similarity_df.csv")
+master = pd.read_csv(DATA_DIR/"master.csv")
+listings_clean = pd.read_csv(DATA_DIR_2/"Listings_Clean.csv")
+similarity_df = pd.read_csv(DATA_DIR/"similarity_df.csv")
 
 # Constants
 LEVEL_1_FILTERS = [
@@ -424,22 +431,33 @@ def generate_recommendations(comparison):
 
 def generate_listing_report(listing_id):
 
+    # Step 0: Retrieve Listing Information
+    listing_info = (
+        listings_clean.loc[
+            listings_clean["listing_id"] == listing_id
+        ]
+        .iloc[0]
+        .to_dict()
+    )
+
     # Step 1: Build Benchmark
     benchmark = build_benchmark(listing_id)
 
-    # Step 2: Benchmark Summary
+    # Step 2: Generate Benchmark Summary
     benchmark_summary = get_benchmark_summary(benchmark)
 
-    # Step 3: Comparison
+    # Step 3: Compare Listing to Benchmark
     comparison = compare_to_benchmark(
         listing_id,
         benchmark_summary
     )
 
-    # Step 4: Recommendations
+    # Step 4: Generate Recommendations
     recommendations = generate_recommendations(comparison)
 
+    # Step 5: Return Complete Report
     return {
+        "listing_info": listing_info,
         "benchmark": benchmark,
         "benchmark_summary": benchmark_summary,
         "comparison": comparison,
