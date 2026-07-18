@@ -1,170 +1,239 @@
 """
-StaySense - Overview Page
-
-Entry point of the app. Sets up the narrative: the problem StaySense
-solves, how it solves it, and a snapshot of the underlying dataset.
-
-Author: Parv Gupta
+StaySense - Home Page
 """
 
 import streamlit as st
-import pandas as pd
 
 from recommendation_engine import master, similarity_df
 
+st.set_page_config(page_title="StaySense | Home", page_icon="🏠", layout="wide")
+
 # =====================================================
-# Page Configuration
+# Theme
 # =====================================================
 
-st.set_page_config(
-    page_title="StaySense | Overview",
-    page_icon="🏠",
-    layout="wide"
-)
+ACCENT = "#FF5A5F"
+CARD_BG = "#1A1D24"
+CARD_BORDER = "#2A2E38"
+TEXT_MUTED = "#9CA3AF"
 
-st.markdown("""
+st.markdown(f"""
 <style>
-.block-container {
-    padding-top: 1.5rem;
-}
+
+.block-container {{
+    padding-top: 2rem;
+    max-width: 1100px;
+}}
+
+.hero {{
+    text-align: center;
+    padding: 60px 0 30px 0;
+}}
+
+.hero-badge {{
+    display: inline-block;
+    padding: 8px 18px;
+    border-radius: 999px;
+    border: 1px solid {CARD_BORDER};
+    background: rgba(255,255,255,0.03);
+    color: {ACCENT};
+    font-size: 0.9rem;
+    margin-bottom: 25px;
+}}
+
+.hero h1 {{
+    font-size: 4rem;
+    font-weight: 700;
+    margin-bottom: 15px;
+}}
+
+.hero p {{
+    font-size: 1.25rem;
+    color: {TEXT_MUTED};
+    max-width: 720px;
+    margin: auto;
+    line-height: 1.7;
+}}
+
 </style>
 """, unsafe_allow_html=True)
 
-
-
-
 # =====================================================
-# Header
+# Hero
 # =====================================================
 
-st.title("🏠 StaySense")
-st.subheader("Airbnb Listing Intelligence — Decision Support, Not Prediction")
+st.markdown("""
+<div class="hero">
 
-st.markdown(
-    "StaySense helps Airbnb hosts understand how their listing performs "
-    "against genuinely comparable, high-performing listings — and what to "
-    "improve first. It does not predict prices or occupancy; it is an "
-    "analytical benchmarking tool."
-)
+<div class="hero-badge">
+Airbnb Intelligence Platform
+</div>
 
-st.markdown("")
+<h1>🏠 StaySense</h1>
 
-# =====================================================
-# The Problem
-# =====================================================
+<p>
+Benchmarks listings against genuinely comparable peers and
+delivers prioritized recommendations.
+</p>
 
-with st.container(border=True):
-    st.markdown("### 🧩 The Problem")
-    st.markdown(
-        "Every Airbnb listing is unique. A studio in central Paris and a "
-        "villa in the suburbs are not meaningful comparisons, yet most "
-        "host-facing analytics tools compare listings against broad, "
-        "unfiltered averages. A host with a below-average listing in an "
-        "expensive, high-standard neighbourhood can look artificially "
-        "strong — and a genuinely high-performing listing in a modest "
-        "area can look artificially weak."
-    )
+</div>
+""", unsafe_allow_html=True)
 
-st.markdown("")
+left, b1, b2, right = st.columns([2,1.3,1.3,2])
 
-# =====================================================
-# The Solution
-# =====================================================
+with b1:
+    if st.button(
+        "Explore Listings",
+        type="primary",
+        use_container_width=True,
+    ):
+        st.switch_page("pages/1_Listing_Analysis.py")
 
-st.markdown("### 🛠️ The Solution")
-
-col1, col2, col3 = st.columns(3)
-
-with col1:
-    with st.container(border=True):
-        st.markdown("#### 🗺️ Comparable Peers")
-        st.markdown(
-            "Hierarchical filtering (city → neighbourhood → property type) "
-            "narrows the field to listings that are actually comparable, "
-            "falling back to broader geography only when needed."
-        )
-
-with col2:
-    with st.container(border=True):
-        st.markdown("#### 🎯 Similarity Search")
-        st.markdown(
-            "Within that pool, a K-Nearest Neighbors search finds listings "
-            "most similar in size and capacity — accommodates, bedrooms, "
-            "and amenity count."
-        )
-
-with col3:
-    with st.container(border=True):
-        st.markdown("#### 📊 Composite KPIs")
-        st.markdown(
-            "Each listing is scored across three pillars — HostTrust, "
-            "ListingIQ, and ExperienceIQ — which combine into a single "
-            "StayScore for benchmarking."
-        )
-
-st.markdown("")
+with b2:
+    if st.button(
+        "View Market Insights",
+        use_container_width=True,
+    ):
+        st.switch_page("pages/2_Market_Insights.py")
+st.write("")
+st.write("")
+ 
 
 # =====================================================
-# Dataset Overview
+# Dataset Snapshot
 # =====================================================
 
-st.markdown("### 📁 Dataset Overview")
+st.header("📈 Dataset Snapshot")
 
 total_listings = len(master)
 total_cities = similarity_df["city"].nunique()
 avg_stayscore = master["StayScore"].mean()
-scored_listings = master["StayScore"].notna().sum()
+median_price = similarity_df["price"].median()
 
 m1, m2, m3, m4 = st.columns(4)
-m1.metric("Total Listings", f"{total_listings:,}")
-m2.metric("Cities Covered", f"{total_cities:,}")
-m3.metric("Listings with a StayScore", f"{scored_listings:,}")
+m1.metric("Listings", f"{total_listings:,}")
+m2.metric("Cities", total_cities)
+m3.metric("Median Price", f"${median_price:,.0f}")
 m4.metric("Average StayScore", f"{avg_stayscore:.1f}")
 
-chart_col1, chart_col2 = st.columns(2)
-
-with chart_col1:
-    with st.container(border=True):
-        st.markdown("**StayScore Distribution**")
-        st.caption("How overall performance scores are spread across all scored listings.")
-
-        stayscore_chart_data = master["StayScore"].dropna()
-        binned_counts = pd.cut(stayscore_chart_data, bins=20).value_counts().sort_index()
-        binned_counts.index = binned_counts.index.astype(str)  # Interval objects aren't chart-serializable
-
-        st.bar_chart(binned_counts, use_container_width=True)
-
-with chart_col2:
-    with st.container(border=True):
-        st.markdown("**Listings by City (Top 10)**")
-        st.caption("Where the dataset's listings are concentrated.")
-
-        top_cities = similarity_df["city"].value_counts().head(10)
-        st.bar_chart(top_cities, use_container_width=True)
-
-st.markdown("")
+st.divider()
 
 # =====================================================
-# What's Next
+# Project Overview
 # =====================================================
 
-with st.container(border=True):
-    st.markdown("### 🚀 Explore StaySense")
+st.header("🌍 Project Overview")
 
-    nav_col1, nav_col2 = st.columns(2)
+left, right = st.columns([1.3, 1])
 
-    with nav_col1:
-        st.markdown("**📋 Listing Analysis**")
-        st.markdown(
-            "Look up a specific listing and see its full performance "
-            "breakdown against its benchmark peers."
-        )
+with left:
+    st.markdown("""
+### Why StaySense?
 
-    with nav_col2:
-        st.markdown("**🔬 Methodology**")
-        st.markdown(
-            "A detailed walkthrough of the KPI construction, candidate "
-            "selection logic, and benchmarking approach behind StaySense."
-        )
+Traditional Airbnb analytics compare listings using broad, unfiltered averages —
+a studio in central Paris isn't a meaningful comparison for a villa in the
+suburbs.
 
-    st.info("Use the sidebar to navigate between pages.")
+StaySense benchmarks every listing against genuinely comparable peers using
+hierarchical filtering and similarity search, then scores performance using
+custom KPIs built specifically for this dataset.
+""")
+
+with right:
+    with st.container(border=True):
+        st.subheader("Objective")
+        st.markdown("""
+- Comparable peer selection
+- K-Nearest Neighbors similarity search
+- Composite performance KPIs
+- Interactive benchmarking dashboard
+""")
+
+st.divider()
+
+# =====================================================
+# Key Features
+# =====================================================
+
+st.header("✨ Key Features")
+
+features = [
+    ("📊", "Market Insights", "Executive Power BI analytics across the full dataset."),
+    ("🔍", "Listing Analysis", "Benchmark any listing against its top-performing peers."),
+    ("⭐", "Custom KPIs", "StayScore, HostTrust, ListingIQ & ExperienceIQ."),
+    ("📈", "Recommendations", "Prioritized, actionable improvement guidance."),
+]
+
+for col, (icon, title, desc) in zip(st.columns(4), features):
+    with col:
+        with st.container(border=True):
+            st.markdown(f"**{icon} {title}**")
+            st.caption(desc)
+
+st.divider()
+
+# =====================================================
+# Custom KPIs
+# =====================================================
+
+st.header("🏆 Custom KPIs")
+
+kpis = [
+    ("StayScore", "Composite overall listing performance."),
+    ("HostTrust", "Host reliability and responsiveness."),
+    ("ListingIQ", "Listing completeness and quality."),
+    ("ExperienceIQ", "Guest experience and satisfaction."),
+]
+
+for col, (title, desc) in zip(st.columns(4), kpis):
+    with col:
+        with st.container(border=True):
+            st.markdown(f"**{title}**")
+            st.caption(desc)
+
+st.divider()
+
+# =====================================================
+# Workflow
+# =====================================================
+
+st.header("⚙️ Workflow")
+st.markdown(
+    "`Dataset` → `Cleaning` → `Feature Engineering` → `Custom KPIs` → "
+    " `Similarity Search` → `Power BI` → `Streamlit`"
+)
+
+st.divider()
+
+# =====================================================
+# Technology Stack
+# =====================================================
+
+st.header("💻 Technology Stack")
+st.write("🐍 Python  |  🐼 Pandas  |  🔢 NumPy  |  📊 Power BI  |  ⚡ DAX  |  🟠 Streamlit")
+
+st.divider()
+
+# =====================================================
+# Explore StaySense
+# =====================================================
+
+st.header("🚀 Explore StaySense")
+
+nav_cards = [
+    ("📈 Market Insights", "Explore the full Power BI report.", "pages/2_Market_Insights.py"),
+    ("📋 Listing Analysis", "Analyze and benchmark individual listings.", "pages/1_Listing_Analysis.py"),
+    ("🔬 Methodology", "Understand the analytical approach.", "pages/3_Methodology.py"),
+]
+
+for col, (title, desc, target) in zip(st.columns(3), nav_cards):
+    with col:
+        with st.container(border=True):
+            st.markdown(f"**{title}**")
+            st.caption(desc)
+            st.page_link(target, label="Open →")
+
+st.markdown(
+    '<div class="footer">Built using Streamlit, Python & Power BI.</div>',
+    unsafe_allow_html=True,
+)

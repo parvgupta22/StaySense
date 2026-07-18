@@ -23,7 +23,46 @@ st.set_page_config(
     layout="wide"
 )
 
+# =====================================================
+# Theme (matches Home / Listing Analysis)
+# =====================================================
 
+ACCENT = "#FF5A5F"
+CARD_BG = "#1A1D24"
+CARD_BORDER = "#2A2E38"
+TEXT_MUTED = "#9CA3AF"
+
+st.markdown(f"""
+<style>
+.step-strip {{ display: flex; align-items: center; gap: 4px; margin-bottom: 12px; }}
+.step-card {{
+    background: {CARD_BG};
+    border: 1px solid {CARD_BORDER};
+    border-radius: 10px;
+    padding: 10px 6px;
+    text-align: center;
+    flex: 1;
+}}
+.step-card .icon {{ font-size: 1.5em; }}
+.step-card .label {{ font-size: 0.78em; font-weight: 600; color: #E5E5E5; margin-top: 2px; }}
+.step-arrow {{ color: {TEXT_MUTED}; font-size: 1.2em; padding: 0 2px; }}
+
+.section-header {{
+    border-left: 3px solid {ACCENT};
+    padding-left: 12px;
+    margin: 4px 0 14px 0;
+}}
+.section-header h2 {{ margin: 0; }}
+
+.approach-chosen {{
+    background: {CARD_BG};
+    border: 1px solid {ACCENT};
+    border-radius: 10px;
+    padding: 14px 16px;
+    color: #E5E5E5;
+}}
+</style>
+""", unsafe_allow_html=True)
 
 # =====================================================
 # Header
@@ -50,24 +89,26 @@ pipeline_steps = [
     ("6", "📊", "Comparison"),
 ]
 
-step_cols = st.columns(len(pipeline_steps))
-for col, (num, icon, label) in zip(step_cols, pipeline_steps):
-    with col:
-        st.markdown(
-            f"<div style='text-align:center; padding:8px 4px;'>"
-            f"<div style='font-size:1.8em;'>{icon}</div>"
-            f"<div style='font-weight:700; font-size:0.85em;'>{num}. {label}</div>"
-            f"</div>",
-            unsafe_allow_html=True,
-        )
+strip_html = "<div class='step-strip'>"
+for i, (num, icon, label) in enumerate(pipeline_steps):
+    strip_html += (
+        f"<div class='step-card'>"
+        f"<div class='icon'>{icon}</div>"
+        f"<div class='label'>{num}. {label}</div>"
+        f"</div>"
+    )
+    if i < len(pipeline_steps) - 1:
+        strip_html += "<div class='step-arrow'>→</div>"
+strip_html += "</div>"
 
+st.markdown(strip_html, unsafe_allow_html=True)
 st.markdown("---")
 
 # =====================================================
 # 1. KPI Definitions
 # =====================================================
 
-st.header("1️⃣ 🧮 KPI Definitions")
+st.markdown('<div class="section-header"><h2>1️⃣ 🧮 KPI Definitions</h2></div>', unsafe_allow_html=True)
 
 st.markdown(
     "Every listing is scored across three independent pillars, each "
@@ -80,7 +121,7 @@ with k1:
     with st.container(border=True):
         st.markdown("#### HostTrust")
         st.caption(
-            "Host reliability: experience, superhost status, response rate, "
+            "Host reliability: experience, response rate, "
             "acceptance rate, identity verification, response time."
         )
 
@@ -109,9 +150,7 @@ with st.container(border=True):
         "score entirely. A transparency column tracks how many components "
         "were actually used for each listing, and listings with fewer than "
         "3 components present are excluded rather than scored on too "
-        "little information. ExperienceIQ's missingness — largely from "
-        "listings without enough reviews yet — is handled the same way, "
-        "one level up, when StayScore is calculated."
+        "little information."
     )
 
 st.markdown("")
@@ -120,24 +159,27 @@ st.markdown("")
 # 2. StayScore Calculation
 # =====================================================
 
-st.header("2️⃣ ⭐ StayScore Calculation")
+st.markdown('<div class="section-header"><h2>2️⃣ ⭐ StayScore Calculation</h2></div>', unsafe_allow_html=True)
 
 st.markdown(
     "StayScore combines the three KPI pillars into a single composite "
-    "performance number. Several weighting approaches were evaluated before "
-    "arriving at the current method:"
+    "performance number."
 )
 
-with st.container(border=True):
+st.markdown(
+    """<div class='approach-chosen'>
+    <strong>Equal-thirds weighting</strong><br>
+    HostTrust, ListingIQ, and ExperienceIQ each contribute one third
+    (33.33% / 33.33% / 33.34%) to the final StayScore. This is a deliberate,
+    documented default: the most defensible option in the absence of a
+    ground-truth outcome variable or business-defined priority between the
+    three pillars. As soon as either becomes available — a real conversion
+    metric or explicit business priorities — the weighting can move to a
+    supervised or AHP-based approach instead.
+    </div>""",
+    unsafe_allow_html=True,
+)
 
-    st.markdown(
-        "**Chosen approach: equal-thirds weighting** — HostTrust, "
-        "ListingIQ, and ExperienceIQ each contribute one third "
-        "(33.33% / 33.33% / 33.34%) to the final StayScore. This is a "
-        "deliberate, documented default: the most defensible option in the "
-        "absence of a ground-truth outcome variable or business-defined "
-        "priority between the three pillars."
-    )
 
 st.markdown("")
 
@@ -145,7 +187,7 @@ st.markdown("")
 # 3. Candidate Pool Construction
 # =====================================================
 
-st.header("3️⃣ 🗺️ Candidate Pool Construction")
+st.markdown('<div class="section-header"><h2>3️⃣ 🗺️ Candidate Pool Construction</h2></div>', unsafe_allow_html=True)
 
 st.markdown(
     "Before any similarity scoring happens, StaySense narrows the field to "
@@ -173,7 +215,7 @@ st.markdown("")
 # 4. Similarity Search
 # =====================================================
 
-st.header("4️⃣ 🎯 Similarity Search")
+st.markdown('<div class="section-header"><h2>4️⃣ 🎯 Similarity Search</h2></div>', unsafe_allow_html=True)
 
 st.markdown(
     "Within a listing's candidate pool, StaySense uses a **K-Nearest "
@@ -200,7 +242,7 @@ st.markdown("")
 # 5. Benchmark Construction
 # =====================================================
 
-st.header("5️⃣ 🏆 Benchmark Construction")
+st.markdown('<div class="section-header"><h2>5️⃣ 🏆 Benchmark Construction</h2></div>', unsafe_allow_html=True)
 
 with st.container(border=True):
     st.markdown(
@@ -210,9 +252,9 @@ with st.container(border=True):
         "similar listings, not just any similar listing."
     )
     st.markdown(
-        "This reflects the product's purpose: hosts aren't shown 'what's "
-        "typical' among their peers, they're shown 'what's achievable' "
-        "among listings that are genuinely comparable to their own."
+        "This reflects the product's purpose: it doesn't show 'what's "
+        "typical' among comparable listings — it shows 'what's achievable' "
+        "among listings that are genuinely comparable."
     )
 
 st.markdown("")
@@ -221,7 +263,7 @@ st.markdown("")
 # 6. Comparison
 # =====================================================
 
-st.header("6️⃣ 📊 Comparison")
+st.markdown('<div class="section-header"><h2>6️⃣ 📊 Comparison</h2></div>', unsafe_allow_html=True)
 
 with st.container(border=True):
     st.markdown(
@@ -236,7 +278,7 @@ with st.container(border=True):
         "based on the size and direction of the gap"
     )
     st.markdown(
-        "This is the step a host actually sees first on the Listing "
+        "This is the step a viewer actually sees first on the Listing "
         "Analysis page — everything above it is the analytical foundation "
         "that makes that comparison meaningful."
     )
