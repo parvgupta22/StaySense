@@ -139,21 +139,6 @@ StaySense/
 └── .gitignore
 ```
 
----
-
-# 🚀 Installation
-
-```bash
-git clone https://github.com/parvgupta22/StaySense.git
-
-cd StaySense
-
-pip install -r requirements.txt
-
-streamlit run Src/Home.py
-```
-
----
 
 # 👨‍💻 Author
 
