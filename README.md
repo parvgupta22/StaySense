@@ -36,12 +36,12 @@ StaySense solves this problem by benchmarking every listing against genuinely co
 
 # ✨ Features
 
-- 📋 **Listing Analysis** – Benchmark an Airbnb listing against comparable high-performing properties.
-- 📊 **Market Insights** – Interactive Power BI dashboards for market-wide analysis.
-- ⭐ **Custom KPIs** – StayScore, HostTrust, ListingIQ, and ExperienceIQ.
-- 🤖 **Machine Learning** – K-Nearest Neighbors similarity search, Random Forest modeling, and Permutation Importance analysis.
-- 📖 **Methodology** – Transparent end-to-end benchmarking pipeline.
-- 📈 **Business Insights** – Marketplace trends, pricing analysis, and performance benchmarking.
+- **Listing Analysis** – Benchmark an Airbnb listing against comparable high-performing properties.
+- **Market Insights** – Interactive Power BI dashboards for market-wide analysis.
+- **Custom KPIs** – StayScore, HostTrust, ListingIQ, and ExperienceIQ.
+- **Machine Learning** – K-Nearest Neighbors similarity search, Random Forest modeling, and Permutation Importance analysis.
+- **Methodology** – Transparent end-to-end benchmarking pipeline.
+- **Business Insights** – Marketplace trends, pricing analysis, and performance benchmarking.
 
 ---
 
