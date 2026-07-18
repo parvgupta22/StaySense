@@ -10,19 +10,19 @@
 ------------------------------------------------------------------------
 ### 🏠 Home
 
-![Home](images/home.png)
+![Home](Images/home.png)
 
 ### 📋 Listing Analysis
 
-![Listing Analysis](images/listing-analysis.png)
+![Listing Analysis](Images/listing-analysis.png)
 
 ### 📊 Market Insights
 
-![Dashboard](images/dashboard.png)
+![Dashboard](Images/dashboard.png)
 
 ### 📖 Methodology
 
-![Methodology](images/methodology.png)
+![Methodology](Images/methodology.png)
 
 ------------------------------------------------------------------------
 
@@ -139,5 +139,5 @@ streamlit run Home.py
 
 **Parv Gupta**
 
--   GitHub: `<https://github.com/parvgupta22>`
--   LinkedIn: `<https://www.linkedin.com/in/parv-gupta-00b340250/>`
+-   GitHub: https://github.com/parvgupta22
+-   LinkedIn: https://www.linkedin.com/in/parv-gupta-00b340250/
